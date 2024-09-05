@@ -27,19 +27,12 @@ public class TestReporterBot extends AbstractBotApplication {
     RESTestLoader loader = new RESTestLoader(userConfigPath);
     Collection<TestCase> testCases = readTestCases(new File(loader.getTargetDirJava(), batchId));
 
-    /* At this moment, reporting does not work incrementally, so we need to treat every batch
-     * as a different experiment. StatsReportManager#generateReport iterates over the test execution
-     * results, including those from previous batches, and tries to find its associated test case by
-     * its test ID among the test cases of the current batch, resulting in an exception.
-     */
-    loader.setExperimentName(loader.getExperimentName().concat("-").concat(batchId));
+    AllureReportManager allureReportManager = loader.createAllureReportManager();
+    allureReportManager.generateReport();
 
     StatsReportManager statsReportManager = loader.createStatsReportManager();
     statsReportManager.setTestCases(testCases);
-    AllureReportManager allureReportManager = loader.createAllureReportManager();
-
-    allureReportManager.generateReport();
-    statsReportManager.generateReport(loader.getExperimentName(), true);
+    statsReportManager.generateReport(batchId, true);
   }
 
   @SuppressWarnings("unchecked")
