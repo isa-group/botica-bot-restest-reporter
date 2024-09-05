@@ -1,10 +1,10 @@
 package es.us.isa.restest.bot.report;
 
 import es.us.isa.botica.bot.AbstractBotApplication;
+import es.us.isa.restest.reporting.AllureReportManager;
 import es.us.isa.restest.reporting.StatsReportManager;
-import es.us.isa.restest.runners.BoticaRESTestLoader;
+import es.us.isa.restest.runners.RESTestLoader;
 import es.us.isa.restest.testcases.TestCase;
-import es.us.isa.restest.util.RESTestException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class TestReporterBot extends AbstractBotApplication {
     String batchId = message.getString("batchId");
     String userConfigPath = message.getString("userConfigPath");
 
-    BoticaRESTestLoader loader = new BoticaRESTestLoader(userConfigPath);
+    RESTestLoader loader = new RESTestLoader(userConfigPath);
     Collection<TestCase> testCases = readTestCases(new File(loader.getTargetDirJava(), batchId));
 
     /* At this moment, reporting does not work incrementally, so we need to treat every batch
@@ -34,17 +34,12 @@ public class TestReporterBot extends AbstractBotApplication {
      */
     loader.setExperimentName(loader.getExperimentName().concat("-").concat(batchId));
 
-    try {
-      loader.createGenerator(); // loads RESTestLoader#spec, necessary to create the stats report
-      // manager
-      StatsReportManager statsReportManager = loader.createStatsReportManager();
-      statsReportManager.setTestCases(testCases);
+    StatsReportManager statsReportManager = loader.createStatsReportManager();
+    statsReportManager.setTestCases(testCases);
+    AllureReportManager allureReportManager = loader.createAllureReportManager();
 
-      loader.createAllureReportManager().generateReport();
-      statsReportManager.generateReport(loader.getExperimentName(), true);
-    } catch (RESTestException e) {
-      throw new RuntimeException(e);
-    }
+    allureReportManager.generateReport();
+    statsReportManager.generateReport(loader.getExperimentName(), true);
   }
 
   @SuppressWarnings("unchecked")
