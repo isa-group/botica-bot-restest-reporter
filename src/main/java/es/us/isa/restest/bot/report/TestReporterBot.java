@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import org.json.JSONObject;
 
@@ -20,6 +23,8 @@ import org.json.JSONObject;
 public class TestReporterBot extends AbstractBotApplication {
   @Override
   public void onOrderReceived(String raw) {
+    this.logReceivedOrder(raw);
+
     JSONObject message = new JSONObject(raw);
     String batchId = message.getString("batchId");
     String userConfigPath = message.getString("userConfigPath");
@@ -33,6 +38,25 @@ public class TestReporterBot extends AbstractBotApplication {
     StatsReportManager statsReportManager = loader.createStatsReportManager();
     statsReportManager.setTestCases(testCases);
     statsReportManager.generateReport(batchId, true);
+  }
+
+  private void logReceivedOrder(String message) {
+    this.logEvaluation(message, "received.txt");
+  }
+
+  private void logEvaluation(String message, String fileName) {
+    try {
+      String directory = String.format("/app/target/evaluation/%s/", getBotId());
+      Files.createDirectories(Path.of(directory));
+      Files.writeString(
+          Path.of(directory, fileName),
+          message + "\n",
+          StandardOpenOption.WRITE,
+          StandardOpenOption.CREATE,
+          StandardOpenOption.APPEND);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @SuppressWarnings("unchecked")
