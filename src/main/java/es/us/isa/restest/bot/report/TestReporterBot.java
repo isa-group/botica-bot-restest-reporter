@@ -1,6 +1,7 @@
 package es.us.isa.restest.bot.report;
 
-import es.us.isa.botica.bot.AbstractBotApplication;
+import es.us.isa.botica.bot.BaseBot;
+import es.us.isa.botica.bot.DefaultOrderHandler;
 import es.us.isa.restest.reporting.AllureReportManager;
 import es.us.isa.restest.reporting.StatsReportManager;
 import es.us.isa.restest.runners.RESTestLoader;
@@ -17,9 +18,9 @@ import org.json.JSONObject;
  *
  * @author Alberto Mimbrero
  */
-public class TestReporterBot extends AbstractBotApplication {
-  @Override
-  public void onOrderReceived(String raw) {
+public class TestReporterBot extends BaseBot {
+  @DefaultOrderHandler
+  public void handleOrder(String raw) {
     JSONObject message = new JSONObject(raw);
     String batchId = message.getString("batchId");
     String userConfigPath = message.getString("userConfigPath");
