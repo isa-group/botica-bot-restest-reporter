@@ -34,6 +34,8 @@ public class TestReporterBot extends BaseBot {
     StatsReportManager statsReportManager = loader.createStatsReportManager();
     statsReportManager.setTestCases(testCases);
     statsReportManager.generateReport(batchId, true);
+
+    publishOrder(message.put("batchSize", testCases.size()).toString());
   }
 
   @SuppressWarnings("unchecked")
