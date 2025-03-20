@@ -20,8 +20,7 @@ import org.json.JSONObject;
  */
 public class TestReporterBot extends BaseBot {
   @DefaultOrderHandler
-  public void handleOrder(String raw) {
-    JSONObject message = new JSONObject(raw);
+  public void handleOrder(JSONObject message) {
     String batchId = message.getString("batchId");
     String userConfigPath = message.getString("userConfigPath");
 
