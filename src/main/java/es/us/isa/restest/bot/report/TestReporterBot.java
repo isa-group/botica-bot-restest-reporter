@@ -1,7 +1,7 @@
 package es.us.isa.restest.bot.report;
 
 import es.us.isa.botica.bot.BaseBot;
-import es.us.isa.botica.bot.DefaultOrderHandler;
+import es.us.isa.botica.bot.OrderHandler;
 import es.us.isa.restest.reporting.AllureReportManager;
 import es.us.isa.restest.reporting.StatsReportManager;
 import es.us.isa.restest.runners.RESTestLoader;
@@ -19,8 +19,9 @@ import org.json.JSONObject;
  * @author Alberto Mimbrero
  */
 public class TestReporterBot extends BaseBot {
-  @DefaultOrderHandler
-  public void handleOrder(JSONObject message) {
+
+  @OrderHandler("generate_reports")
+  public void generateReports(JSONObject message) {
     String batchId = message.getString("batchId");
     String userConfigPath = message.getString("userConfigPath");
 
@@ -34,7 +35,10 @@ public class TestReporterBot extends BaseBot {
     statsReportManager.setTestCases(testCases);
     statsReportManager.generateReport(batchId, true);
 
-    publishOrder(message.put("batchSize", testCases.size()).toString());
+    publishOrder(
+        "oracle_identifier_bots",
+        "analyze_invariants",
+        message.put("batchSize", testCases.size()).toString());
   }
 
   @SuppressWarnings("unchecked")
